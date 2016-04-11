@@ -43,23 +43,32 @@ function s:update(cmd, input)
 		let s = stridx(line, "/^")
 		let e = stridx(line, "\$/;\"", s)
 
-		let signature = strpart(line, s + 2, e - s - 2)
-		let line = substitute(line, '\t/^' . signature . '\$/;\"', "", "")
+		let signature = ""
 
-		let signature = matchstr(signature, "[a-zA-Z].*[)a-zA-Z0-9]")
+		if s != -1 && e != -1
+			let signature = strpart(line, s + 2, e - s - 2)
+			let signature = matchstr(signature, "[a-zA-Z].*[)a-zA-Z0-9]")
+
+			let line = substitute(line, '/^.*\$/;\"', "", "")
+		endif
+
 		let tk = split(line, '\t')
 
-		if len(tk) < 4
+		if len(tk) < 5
 			continue
 		endif
 
 		let sym = tk[0]
 		let file = fnamemodify(tk[1], ':.')
 
+		if signature == ""
+			let signature = sym
+		endif
+
 		let lst_entry = [{
 			\ "file": file,
-			\ "line": split(tk[3], ':')[1],
-			\ "kind": split(tk[2], ':')[1],
+			\ "line": split(tk[4], ':')[1],
+			\ "kind": split(tk[3], ':')[1],
 			\ "signature": signature,
 			\ }]
 
