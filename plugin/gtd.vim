@@ -88,7 +88,7 @@ function s:sym_focus(file, line)
 		if bufname('%') != a:file
 			exec "rightbelow 40vsplit " . a:file
 			autocmd BufLeave <buffer> call s:split_close()
-			nmap q :call <sid>split_close()<cr>
+			nmap <buffer> <silent> q :call <sid>split_close()<cr>
 		endif
 
 		exec a:line
@@ -100,6 +100,7 @@ endfunction
 "{{{
 function s:split_close()
 	autocmd! BufLeave <buffer>
+	nunmap <buffer> q
 	silent! close
 endfunction
 "}}}
@@ -224,20 +225,20 @@ autocmd BufWritePost	*.c,*.cc,*.cpp,*.h		call gtd#symtab#update(bufname("%"))
 "" mappings
 """"
 "{{{
-exec "nmap " . g:gtd_key_head_focus		. " :call <sid>fct_head('g')<cr>"
-exec "nmap " . g:gtd_key_head_list		. " :call <sid>fct_head('l')<cr>"
+exec "nmap <silent> " . g:gtd_key_head_focus	. " :call <sid>fct_head('g')<cr>"
+exec "nmap <silent> " . g:gtd_key_head_list		. " :call <sid>fct_head('l')<cr>"
 
-exec "nmap " . g:gtd_key_decl_split		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 's')<cr>"
-exec "nmap " . g:gtd_key_decl_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 't')<cr>"
-exec "nmap " . g:gtd_key_def_split		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 's')<cr>"
-exec "nmap " . g:gtd_key_def_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 't')<cr>"
+exec "nmap <silent> " . g:gtd_key_decl_split	. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 's')<cr>"
+exec "nmap <silent> " . g:gtd_key_decl_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 't')<cr>"
+exec "nmap <silent> " . g:gtd_key_def_split		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 's')<cr>"
+exec "nmap <silent> " . g:gtd_key_def_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 't')<cr>"
 
-exec "nmap " . g:gtd_key_decl_split		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 'gs')<cr>"
-exec "nmap " . g:gtd_key_decl_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 'gt')<cr>"
-exec "nmap " . g:gtd_key_def_split		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 'gs')<cr>"
-exec "nmap " . g:gtd_key_def_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 'gt')<cr>"
+exec "nmap <silent> " . g:gtd_key_decl_split	. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 'gs')<cr>"
+exec "nmap <silent> " . g:gtd_key_decl_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'p', 'gt')<cr>"
+exec "nmap <silent> " . g:gtd_key_def_split		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 'gs')<cr>"
+exec "nmap <silent> " . g:gtd_key_def_tab		. " <insert><c-r>=<sid>sym_lookup(expand('<cword>'), bufname('%'), 'f', 'gt')<cr>"
 
-exec "nmap " . g:gtd_key_opt_menu		. " <insert><c-r>=<sid>opt_menu()<cr>"
-exec "nmap " . g:gtd_key_sym_menu_loc	. " <insert><c-r>=<sid>sym_menu('l')<cr>"
-exec "nmap " . g:gtd_key_sym_menu_glob	. " <insert><c-r>=<sid>sym_menu('g')<cr>"
+exec "nmap <silent> " . g:gtd_key_opt_menu		. " <insert><c-r>=<sid>opt_menu()<cr>"
+exec "nmap <silent> " . g:gtd_key_sym_menu_loc	. " <insert><c-r>=<sid>sym_menu('l')<cr>"
+exec "nmap <silent> " . g:gtd_key_sym_menu_glob	. " <insert><c-r>=<sid>sym_menu('g')<cr>"
 "}}}
