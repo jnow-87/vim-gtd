@@ -35,9 +35,11 @@ let g:gtd_key_decl_tab_glob		= get(g:, "gtd_key_decl_tab_glob", "gtf")
 let g:gtd_key_head_list			= get(g:, "gtd_key_head_list", "lh")
 let g:gtd_key_head_focus		= get(g:, "gtd_key_head_focus", "th")
 
-let g:gtd_key_opt_menu			= get(g:, "gtd_key_menu", "lm")
-let g:gtd_key_sym_menu_loc		= get(g:, "gtd_sym_menu", "ls")
-let g:gtd_key_sym_menu_glob		= get(g:, "gtd_sym_menu", "gls")
+let g:gtd_key_opt_menu			= get(g:, "gtd_key_opt_menu", "lm")
+let g:gtd_key_sym_menu_loc		= get(g:, "gtd_key_sym_menu_loc", "ls")
+let g:gtd_key_sym_menu_glob		= get(g:, "gtd_key_sym_menu_glob", "gls")
+
+let g:gtd_sym_menu				= get(g:, "gtd_sym_menu", "» ")
 "}}}
 
 """"
@@ -47,12 +49,12 @@ let g:gtd_key_sym_menu_glob		= get(g:, "gtd_sym_menu", "gls")
 let s:goto_mode = "s"
 
 let s:opt = [
-	\ {"abbr": "[def split]", "menu": g:gtd_key_def_split},
-	\ {"abbr": "[def tab]", "menu": g:gtd_key_def_tab},
-	\ {"abbr": "[decl split]", "menu": g:gtd_key_decl_split},
-	\ {"abbr": "[decl tab]", "menu": g:gtd_key_decl_tab},
-	\ {"abbr": "[list head]", "menu": g:gtd_key_head_list},
-	\ {"abbr": "[focus head]", "menu": g:gtd_key_head_focus},
+	\ {"abbr": g:gtd_sym_menu . "def split", "menu": g:gtd_key_def_split},
+	\ {"abbr": g:gtd_sym_menu . "def tab", "menu": g:gtd_key_def_tab},
+	\ {"abbr": g:gtd_sym_menu . "decl split", "menu": g:gtd_key_decl_split},
+	\ {"abbr": g:gtd_sym_menu . "decl tab", "menu": g:gtd_key_decl_tab},
+	\ {"abbr": g:gtd_sym_menu . "list head", "menu": g:gtd_key_head_list},
+	\ {"abbr": g:gtd_sym_menu . "focus head", "menu": g:gtd_key_head_focus},
 \ ]
 "}}}
 
