@@ -56,26 +56,20 @@ function s:update(cmd, input)
 		let sym = tk[0]
 		let file = fnamemodify(tk[1], ':.')
 
-		let e_glob = [{
+		let lst_entry = [{
 			\ "file": file,
 			\ "line": split(tk[3], ':')[1],
 			\ "kind": split(tk[2], ':')[1],
 			\ "signature": signature,
 			\ }]
 
-		let e_file = [{
-			\ "line": split(tk[3], ':')[1],
-			\ "kind": split(tk[2], ':')[1],
-			\ "signature": signature,
-			\ }]
-
-		call s:sym_add(s:symtab, sym, e_glob)
+		call s:sym_add(s:symtab, sym, lst_entry)
 
 		if !has_key(s:symtab_file, file)
 			let s:symtab_file[file] = {}
 		endif
 
-		call s:sym_add(s:symtab_file[file], sym, e_file)
+		call s:sym_add(s:symtab_file[file], sym, lst_entry)
 	endfor
 endfunction
 "}}}
