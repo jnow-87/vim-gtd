@@ -75,6 +75,7 @@ let g:gtd_symtab_initialised			= 0
 "" highlighting config
 """"
 "{{{
+highlight default gtd_select	ctermfg=255 ctermbg=31
 highlight default gtd_filename	ctermfg=255 ctermbg=244
 highlight default gtd_kind		ctermfg=27
 highlight default gtd_comment	ctermfg=27
@@ -236,7 +237,7 @@ function s:sym_window_select()
 	if line < s:sym_window_line && len(s:sym_window_line_map[line]) == 2
 		" highlight selected line in make buffer
 		match none
-		exec 'match Search /\%' . line('.') . 'l.*/'
+		exec 'match gtd_select /\%' . line('.') . 'l[^ \t].*/'
 
 		" move to symbol
 		call util#window#focus_file(s:sym_window_line_map[line].file, s:sym_window_line_map[line].line, 1)
