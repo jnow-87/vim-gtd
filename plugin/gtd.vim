@@ -247,6 +247,19 @@ function s:sym_window_select()
 endfunction
 "}}}
 
+function s:list_add(lst, dict, key)
+	let i = 0
+	for e in a:lst
+		if e[a:key] >= a:dict[a:key]
+			break
+		endif
+
+		let i += 1
+	endfor
+
+	call insert(a:lst, a:dict, i)
+endfunction
+
 """"
 "" main functions
 """"
@@ -278,11 +291,11 @@ function s:sym_menu()
 		" generate menu list
 		for [sym, sym_lst] in items(symtab["kinds"][kind])
 			for entry in sym_lst
-				if g:gtd_sym_list_show_signature
-					let lst += [{"abbr": entry.signature, "menu": entry.file . ":" . entry.line, "kind": kind }]
-				else
-					let lst += [{"abbr": sym, "menu": entry.file . ":" . entry.line, "kind": kind }]
-				endif
+				call s:list_add(lst, {
+					\ "menu": entry.file . ":" . entry.line,
+					\ "kind": kind,
+					\ "abbr": (g:gtd_sym_list_show_signature ? entry.signature : sym)
+					\ }, "abbr")
 			endfor
 		endfor
 	endfor
@@ -324,7 +337,7 @@ function s:sym_lookup(kind, flags)
 		let menu = []
 
 		for e in syms
-			let menu += [{"abbr": e.signature, "menu": e.file . ":" . e.line . " ", "kind": e.kind }]
+			call s:list_add(menu, {"abbr": e.signature, "menu": e.file . ":" . e.line . " ", "kind": e.kind }, "menu")
 		endfor
 
 		" show menu
@@ -484,17 +497,26 @@ function s:sym_window_update()
 			" print kind longname
 			call s:sym_buf_add_line("  " . gtd#symtab#longname(symtab.lang, kind), {})
 
-			" print symbols for given kind
+			" generate sorted symbol list
+			let lst = []
+
 			for sym in keys(symtab["kinds"][kind])
 				for entry in symtab["kinds"][kind][sym]
-					" either print signature or pure symbol name
-					if g:gtd_sym_window_show_signature
-						call s:sym_buf_add_line("    " . entry.signature, {"file": entry.file, "line": entry.line})
-					else
-						call s:sym_buf_add_line("    " . sym, {"file": entry.file, "line": entry.line})
-					endif
+					" add to list, sort by symbol name (i.e. "key")
+					call s:list_add(lst, {
+						\ "dict": {"file": entry.file, "line": entry.line},
+						\ "key": sym,
+						\ "txt": "    " . (g:gtd_sym_window_show_signature ? entry.signature : sym)
+						\ }, "key")
 				endfor
 			endfor
+
+			" print symbols
+			for e in lst
+				call s:sym_buf_add_line(e.txt, e.dict)
+			endfor
+
+			let lst = []
 
 			call s:sym_buf_add_line("", {})
 		endfor
