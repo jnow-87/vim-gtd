@@ -46,6 +46,8 @@ let g:gtd_sym_list_kinds_Make			= get(g:, "gtd_sym_list_kinds_make", ['m'])
 let g:gtd_sym_list_kinds_Python			= get(g:, "gtd_sym_list_kinds_python", ['c', 'f', 'm', 'v', 'i'])
 let g:gtd_sym_list_kinds_Java			= get(g:, "gtd_sym_list_kinds_java", ['c', 'e', 'f', 'g', 'i', 'l', 'm', 'p'])
 
+let g:gtd_sym_list_show_signature		= get(g:, "gtd_sym_list_show_signature", 0)
+
 let g:gtd_sym_menu						= get(g:, "gtd_sym_menu", "» ")
 "}}}
 
@@ -276,7 +278,11 @@ function s:sym_menu()
 		" generate menu list
 		for [sym, sym_lst] in items(symtab["kinds"][kind])
 			for entry in sym_lst
-				let lst += [{"abbr": "  " . entry.signature, "menu": entry.file . ":" . entry.line . " ", "kind": kind }]
+				if g:gtd_sym_list_show_signature
+					let lst += [{"abbr": entry.signature, "menu": entry.file . ":" . entry.line, "kind": kind }]
+				else
+					let lst += [{"abbr": sym, "menu": entry.file . ":" . entry.line, "kind": kind }]
+				endif
 			endfor
 		endfor
 	endfor
