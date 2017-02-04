@@ -90,12 +90,12 @@ highlight default gtd_comment	ctermfg=27
 "{{{
 " option menu entries
 let s:opt = [
-	\ {"abbr": g:gtd_sym_menu . "def split", "menu": g:gtd_key_def_split},
-	\ {"abbr": g:gtd_sym_menu . "def tab", "menu": g:gtd_key_def_tab},
-	\ {"abbr": g:gtd_sym_menu . "decl split", "menu": g:gtd_key_decl_split},
-	\ {"abbr": g:gtd_sym_menu . "decl tab", "menu": g:gtd_key_decl_tab},
-	\ {"abbr": g:gtd_sym_menu . "list head", "menu": g:gtd_key_head_list},
-	\ {"abbr": g:gtd_sym_menu . "focus head", "menu": g:gtd_key_head_focus},
+	\ {"abbr": g:gtd_sym_menu . "goto definition (split)", "menu": g:gtd_key_def_split},
+	\ {"abbr": g:gtd_sym_menu . "goto defintion (tab)", "menu": g:gtd_key_def_tab},
+	\ {"abbr": g:gtd_sym_menu . "goto declaration (split)", "menu": g:gtd_key_decl_split},
+	\ {"abbr": g:gtd_sym_menu . "goto declaration (tab)", "menu": g:gtd_key_decl_tab},
+	\ {"abbr": g:gtd_sym_menu . "list function head", "menu": g:gtd_key_head_list},
+	\ {"abbr": g:gtd_sym_menu . "focus function head", "menu": g:gtd_key_head_focus},
 \ ]
 "}}}
 
