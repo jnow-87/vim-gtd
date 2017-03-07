@@ -1,7 +1,3 @@
-""""
-"" initialisation
-""""
-"{{{
 if exists('g:loaded_gtd') || &compatible
 	finish
 endif
@@ -10,9 +6,9 @@ let g:loaded_gtd = 1
 
 " get own script ID
 nmap <c-f11><c-f12><c-f13> <sid>
-let s:sid = maparg("<c-f11><c-f12><c-f13>", "n", 0, 1).sid
+let s:sid = "<SNR>" . maparg("<c-f11><c-f12><c-f13>", "n", 0, 1).sid . "_"
 nunmap <c-f11><c-f12><c-f13>
-"}}}
+
 
 """"
 "" global variables
@@ -53,24 +49,30 @@ let g:gtd_sym_menu						= get(g:, "gtd_sym_menu", "» ")
 
 "{{{
 " available mappings
-let g:gtd_key_def_split					= get(g:, "gtd_key_def_split", "lf")
-let g:gtd_key_def_tab					= get(g:, "gtd_key_def_tab", "tf")
-let g:gtd_key_decl_split				= get(g:, "gtd_key_decl_split", "lp")
-let g:gtd_key_decl_tab					= get(g:, "gtd_key_decl_tab", "tp")
+let g:gtd_map_def_split			= get(g:, "gtd_map_def_split", "lf")
+let g:gtd_map_def_tab			= get(g:, "gtd_map_def_tab", "tf")
+let g:gtd_map_decl_split		= get(g:, "gtd_map_decl_split", "lp")
+let g:gtd_map_decl_tab			= get(g:, "gtd_map_decl_tab", "tp")
 
-let g:gtd_key_def_split_glob			= get(g:, "gtd_key_def_split_glob", "glf")
-let g:gtd_key_def_tab_glob				= get(g:, "gtd_key_def_tab_glob", "gtf")
-let g:gtd_key_decl_split_glob			= get(g:, "gtd_key_decl_split_glob", "glp")
-let g:gtd_key_decl_tab_glob				= get(g:, "gtd_key_decl_tab_glob", "gtp")
+let g:gtd_map_def_split_glob	= get(g:, "gtd_map_def_split_glob", "glf")
+let g:gtd_map_def_tab_glob		= get(g:, "gtd_map_def_tab_glob", "gtf")
+let g:gtd_map_decl_split_glob	= get(g:, "gtd_map_decl_split_glob", "glp")
+let g:gtd_map_decl_tab_glob		= get(g:, "gtd_map_decl_tab_glob", "gtp")
 
-let g:gtd_key_head_list					= get(g:, "gtd_key_head_list", "lh")
-let g:gtd_key_head_focus				= get(g:, "gtd_key_head_focus", "th")
+let g:gtd_map_head_list			= get(g:, "gtd_map_head_list", "lh")
+let g:gtd_map_head_focus		= get(g:, "gtd_map_head_focus", "th")
 
-let g:gtd_key_opt_menu					= get(g:, "gtd_key_opt_menu", "lm")
-let g:gtd_key_sym_menu_loc				= get(g:, "gtd_key_sym_menu_loc", "ls")
+let g:gtd_map_opt_menu			= get(g:, "gtd_map_opt_menu", "lm")
+let g:gtd_map_sym_menu_loc		= get(g:, "gtd_map_sym_menu_loc", "ls")
+
+let g:gtd_map_quit				= get(g:, "gtd_map_quit", "q")
+let g:gtd_map_expand			= get(g:, "gtd_map_expand", "x")
+let g:gtd_map_select			= get(g:, "gtd_map_select", "<cr>")
+let g:gtd_map_update_win		= get(g:, "gtd_map_update_win", "u")
+let g:gtd_map_update_sym		= get(g:, "gtd_map_update_sym", "U")
 "}}}
 
-let g:gtd_symtab_initialised			= 0
+let g:gtd_symtab_initialised	= 0
 "}}}
 
 """"
@@ -90,12 +92,12 @@ highlight default gtd_comment	ctermfg=27
 "{{{
 " option menu entries
 let s:opt = [
-	\ {"abbr": g:gtd_sym_menu . "goto definition (split)", "menu": g:gtd_key_def_split},
-	\ {"abbr": g:gtd_sym_menu . "goto defintion (tab)", "menu": g:gtd_key_def_tab},
-	\ {"abbr": g:gtd_sym_menu . "goto declaration (split)", "menu": g:gtd_key_decl_split},
-	\ {"abbr": g:gtd_sym_menu . "goto declaration (tab)", "menu": g:gtd_key_decl_tab},
-	\ {"abbr": g:gtd_sym_menu . "list function head", "menu": g:gtd_key_head_list},
-	\ {"abbr": g:gtd_sym_menu . "focus function head", "menu": g:gtd_key_head_focus},
+	\ {"abbr": g:gtd_sym_menu . "goto definition (split)", "menu": g:gtd_map_def_split},
+	\ {"abbr": g:gtd_sym_menu . "goto defintion (tab)", "menu": g:gtd_map_def_tab},
+	\ {"abbr": g:gtd_sym_menu . "goto declaration (split)", "menu": g:gtd_map_decl_split},
+	\ {"abbr": g:gtd_sym_menu . "goto declaration (tab)", "menu": g:gtd_map_decl_tab},
+	\ {"abbr": g:gtd_sym_menu . "list function head", "menu": g:gtd_map_head_list},
+	\ {"abbr": g:gtd_sym_menu . "focus function head", "menu": g:gtd_map_head_focus},
 \ ]
 "}}}
 
@@ -105,7 +107,7 @@ let s:sym_window_line_map = []
 "}}}
 
 """"
-"" helper functions
+"" local functions
 """"
 "{{{
 " \brief	menu selection handler for symbol menu
@@ -155,8 +157,8 @@ function s:sym_focus(file, line)
 		exec "rightbelow " . g:gtd_sym_preview_width . "vsplit " . a:file
 
 		" set temporary mappings
-		nnoremap <buffer> <silent> q :call <sid>split_close()<cr>
-		nnoremap <buffer> <silent> x :call util#window#expand()<cr>
+		call util#map#n(g:gtd_map_quit, ":call " . s:sid . "split_close()<cr>", "<buffer>")
+		call util#map#n(g:gtd_map_expand, ":call util#window#expand()<cr>", "<buffer>")
 
 		" autocmd to cleanup temporary mappings once leaving the buffers window
 		autocmd WinLeave <buffer> silent call s:split_close()
@@ -177,8 +179,8 @@ function s:split_close()
 	autocmd! WinLeave <buffer>
 
 	" remove mappings
-	nunmap <buffer> q
-	nunmap <buffer> x
+	exec "nunmap <buffer> " . g:gtd_map_quit
+	exec "nunmap <buffer> " . g:gtd_map_expand
 
 	" close the window
 	silent! close
@@ -247,6 +249,7 @@ function s:sym_window_select()
 endfunction
 "}}}
 
+"{{{
 function s:list_add(lst, dict, key)
 	let i = 0
 	for e in a:lst
@@ -259,16 +262,17 @@ function s:list_add(lst, dict, key)
 
 	call insert(a:lst, a:dict, i)
 endfunction
+"}}}
 
 """"
-"" main functions
+"" global functions
 """"
 "{{{
 " \brief	open options menu
 "
 " \return	'<c-r>=' string, triggering auto completion
 function s:opt_menu()
-	return util#pmenu#open(s:opt, "<SNR>" . s:sid . "_opt_selected", "i")
+	return util#pmenu#open(s:opt, s:sid . "opt_selected", "i")
 endfunction
 "}}}
 
@@ -304,7 +308,7 @@ function s:sym_menu()
 	let s:goto_mode = "t"
 
 	" open menu
-	return util#pmenu#open(lst, "<SNR>" . s:sid . "_sym_selected", "i")
+	return util#pmenu#open(lst, s:sid . "sym_selected", "i")
 endfunction
 "}}}
 
@@ -341,7 +345,7 @@ function s:sym_lookup(kind, flags)
 		endfor
 
 		" show menu
-		return util#pmenu#open(menu, "<SNR>" . s:sid . "_sym_selected", "i")
+		return util#pmenu#open(menu, s:sid . "sym_selected", "i")
 	endif
 
 	return ""
@@ -412,11 +416,11 @@ function s:sym_window_show()
 	setlocal nomodifiable
 
 	" buffer mappings
-	nnoremap <buffer> <silent> <cr> :silent call <sid>sym_window_select()<cr>
-	nnoremap <buffer> <silent> q :silent close<cr>
-	nnoremap <buffer> <silent> u :silent call <sid>sym_window_update()<cr>
-	nnoremap <buffer> <silent> U :silent call <sid>update(1)<cr>
-	nnoremap <buffer> <silent> x :silent call util#window#expand()<cr>
+	call util#map#n(g:gtd_map_quit, ":close<cr>", "<buffer>")
+	call util#map#n(g:gtd_map_select, ":call " . s:sid . "sym_window_select()<cr>", "<buffer>")
+	call util#map#n(g:gtd_map_expand, ":call util#window#expand()<cr>", "<buffer>")
+	call util#map#n(g:gtd_map_update_win, ":call " . s:sid . "sym_window_update()<cr>", "<buffer>")
+	call util#map#n(g:gtd_map_update_sym, ":call " . s:sid . "update(1)<cr>", "<buffer>")
 
 	return 1
 endfunction
@@ -457,11 +461,11 @@ function s:sym_window_update()
 	let cur_buf_line = 1
 
 	" print help
-	call s:sym_buf_add_line("\" u: update window", {})
-	call s:sym_buf_add_line("\" U: update symbol table", {})
-	call s:sym_buf_add_line("\" q: close window", {})
-	call s:sym_buf_add_line("\" x: expand window", {})
-	call s:sym_buf_add_line("\" <cr>: goto symbol under cursor", {})
+	call s:sym_buf_add_line("\" " . g:gtd_map_update_win . ": update window", {})
+	call s:sym_buf_add_line("\" " . g:gtd_map_update_sym . ": update symbol table", {})
+	call s:sym_buf_add_line("\" " . g:gtd_map_quit . ": close window", {})
+	call s:sym_buf_add_line("\" " . g:gtd_map_expand . ": expand window", {})
+	call s:sym_buf_add_line("\" " . g:gtd_map_select . ": goto symbol under cursor", {})
 	call s:sym_buf_add_line("", {})
 
 	let bnum = 1
@@ -570,19 +574,19 @@ exec 'autocmd BufEnter ' . g:gtd_sym_window_title . ' silent if winnr("$") == 1 
 "" mappings
 """"
 "{{{
-exec "nmap <silent> " . g:gtd_key_head_focus		. " :call <sid>fct_head('t')<cr>"
-exec "nmap <silent> " . g:gtd_key_head_list			. " :call <sid>fct_head('l')<cr>"
+call util#map#n(g:gtd_map_head_focus,		":call " . s:sid . "fct_head('t')<cr>", "")
+call util#map#n(g:gtd_map_head_list,		":call " . s:sid . "fct_head('l')<cr>", "")
 
-exec "nmap <silent> " . g:gtd_key_decl_split		. " <insert><c-r>=<sid>sym_lookup('p', 'l')<cr>"
-exec "nmap <silent> " . g:gtd_key_decl_tab			. " <insert><c-r>=<sid>sym_lookup('p', 't')<cr>"
-exec "nmap <silent> " . g:gtd_key_def_split			. " <insert><c-r>=<sid>sym_lookup('f', 'l')<cr>"
-exec "nmap <silent> " . g:gtd_key_def_tab			. " <insert><c-r>=<sid>sym_lookup('f', 't')<cr>"
+call util#map#n(g:gtd_map_decl_split,		"<insert><c-r>=" . s:sid . "sym_lookup('p', 'l')<cr>", "")
+call util#map#n(g:gtd_map_decl_tab,			"<insert><c-r>=" . s:sid . "sym_lookup('p', 't')<cr>", "")
+call util#map#n(g:gtd_map_def_split,		"<insert><c-r>=" . s:sid . "sym_lookup('f', 'l')<cr>", "")
+call util#map#n(g:gtd_map_def_tab,			"<insert><c-r>=" . s:sid . "sym_lookup('f', 't')<cr>", "")
 
-exec "nmap <silent> " . g:gtd_key_decl_split_glob	. " <insert><c-r>=<sid>sym_lookup('p', 'gl')<cr>"
-exec "nmap <silent> " . g:gtd_key_decl_tab_glob		. " <insert><c-r>=<sid>sym_lookup('p', 'gt')<cr>"
-exec "nmap <silent> " . g:gtd_key_def_split_glob	. " <insert><c-r>=<sid>sym_lookup('f', 'gl')<cr>"
-exec "nmap <silent> " . g:gtd_key_def_tab_glob		. " <insert><c-r>=<sid>sym_lookup('f', 'gt')<cr>"
+call util#map#n(g:gtd_map_decl_split_glob,	"<insert><c-r>=" . s:sid . "sym_lookup('p', 'gl')<cr>", "")
+call util#map#n(g:gtd_map_decl_tab_glob,	"<insert><c-r>=" . s:sid . "sym_lookup('p', 'gt')<cr>", "")
+call util#map#n(g:gtd_map_def_split_glob,	"<insert><c-r>=" . s:sid . "sym_lookup('f', 'gl')<cr>", "")
+call util#map#n(g:gtd_map_def_tab_glob,		"<insert><c-r>=" . s:sid . "sym_lookup('f', 'gt')<cr>", "")
 
-exec "nmap <silent> " . g:gtd_key_opt_menu			. " <insert><c-r>=<sid>opt_menu()<cr>"
-exec "nmap <silent> " . g:gtd_key_sym_menu_loc		. " <insert><c-r>=<sid>sym_menu()<cr>"
+call util#map#n(g:gtd_map_opt_menu,			"<insert><c-r>=" . s:sid . "opt_menu()<cr>", "")
+call util#map#n(g:gtd_map_sym_menu_loc,		"<insert><c-r>=" . s:sid . "sym_menu()<cr>", "")
 "}}}

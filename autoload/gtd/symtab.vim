@@ -4,8 +4,9 @@ endif
 
 let g:loaded_gtd_symtab = 1
 
+
 """"
-" local variables
+"" local variables
 """"
 "{{{
 "{{{
@@ -121,7 +122,7 @@ let s:kinds_longnames = {
 "}}}
 
 """"
-"" helper functions
+"" local functions
 """"
 "{{{
 " \brief	add (key, value) to dictionary
@@ -271,7 +272,7 @@ endfunction
 "}}}
 
 """"
-"" main functions
+"" global functions
 """"
 "{{{
 " \brief	update symtabs using given file
