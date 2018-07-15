@@ -18,9 +18,10 @@ let s:ctags_kinds_sh = "f"
 let s:ctags_kinds_make = "m"
 let s:ctags_kinds_python = "cfv"
 let s:ctags_kinds_java = "cegilm"
+let s:ctags_kinds_php = "cidfvj"
 let s:ctags_fields = "zknl"
 let s:ctags_extras = ""
-let s:ctags_args = "-R --filter=yes --languages=c,c++,asm,vim,sh,make,python,java"
+let s:ctags_args = "-R --filter=yes --languages=c,c++,asm,vim,sh,make,python,java,php"
 
 let s:ctags_cmd = 
 	\ "ctags " . s:ctags_args
@@ -34,6 +35,7 @@ let s:ctags_cmd =
 	\ . " --make-kinds=" . s:ctags_kinds_make
 	\ . " --python-kinds=" . s:ctags_kinds_python
 	\ . " --java-kinds=" . s:ctags_kinds_java
+	\ . " --php-kinds=" . s:ctags_kinds_php
 "}}}
 
 "{{{
@@ -115,6 +117,15 @@ let s:kinds_longnames = {
 		\ "m" : "methods",
 		\ "p" : "packages",
 		\ "func_kind" : "m",
+		\ "proto_kind" : "",
+	\ },
+	\ "PHP" : {
+		\ "c" : "classes",
+		\ "i" : "interfaces",
+		\ "d" : "constants",
+		\ "f" : "functions",
+		\ "j" : "javascript",
+		\ "func_kind" : "f",
 		\ "proto_kind" : "",
 	\ },
 \ }

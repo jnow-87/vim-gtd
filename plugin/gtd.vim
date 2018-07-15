@@ -30,6 +30,7 @@ let g:gtd_sym_window_kinds_Sh			= get(g:, "gtd_sym_window_kinds_sh", ['f'])
 let g:gtd_sym_window_kinds_Make			= get(g:, "gtd_sym_window_kinds_make", ['m'])
 let g:gtd_sym_window_kinds_Python		= get(g:, "gtd_sym_window_kinds_python", ['c', 'f', 'm', 'v', 'i'])
 let g:gtd_sym_window_kinds_Java			= get(g:, "gtd_sym_window_kinds_java", ['c', 'e', 'f', 'g', 'i', 'l', 'm', 'p'])
+let g:gtd_sym_window_kinds_PHP			= get(g:, "gtd_sym_window_kinds_php", ['c', 'i', 'd', 'f', 'j'])
 "}}}
 
 "{{{
@@ -41,6 +42,7 @@ let g:gtd_sym_list_kinds_Sh				= get(g:, "gtd_sym_list_kinds_sh", ['f'])
 let g:gtd_sym_list_kinds_Make			= get(g:, "gtd_sym_list_kinds_make", ['m'])
 let g:gtd_sym_list_kinds_Python			= get(g:, "gtd_sym_list_kinds_python", ['c', 'f', 'm', 'v', 'i'])
 let g:gtd_sym_list_kinds_Java			= get(g:, "gtd_sym_list_kinds_java", ['c', 'e', 'f', 'g', 'i', 'l', 'm', 'p'])
+let g:gtd_sym_list_kinds_Php			= get(g:, "gtd_sym_list_kinds_php", ['c', 'i', 'd', 'f', 'j'])
 
 let g:gtd_sym_list_show_signature		= get(g:, "gtd_sym_list_show_signature", 0)
 
@@ -220,7 +222,7 @@ function s:update(force_all)
 			" perform update for all open buffers
 			call gtd#symtab#update_openbufs()
 
-		elseif &filetype == "c" || &filetype == "cpp" || &filetype == "asm" || &filetype == "vim" || &filetype == "sh" || &filetype == "make" || &filetype == "python" || &filetype == "java"
+		elseif &filetype == "c" || &filetype == "cpp" || &filetype == "asm" || &filetype == "vim" || &filetype == "sh" || &filetype == "make" || &filetype == "python" || &filetype == "java" || &filetype == "php"
 			" perform update for current buffer if it filetype is considered
 			call gtd#symtab#update_buf(bufname('%'))
 		endif
