@@ -22,6 +22,7 @@ let g:gtd_sym_preview_width				= get(g:, "gtd_sym_preview_width", "40")
 
 let g:gtd_sym_window_show_signature		= get(g:, "gtd_sym_window_show_signature", 1)
 let g:gtd_sym_window_foldopen			= get(g:, "gtd_sym_window_foldopen", 0)
+let g:gtd_sym_window_close_on_select	= get(g:, "gtd_sym_window_close_on_select", 0)
 
 let g:gtd_sym_window_kinds_C			= get(g:, "gtd_sym_window_kinds_c", ['c', 'd', 'f', 'g', 'l', 'p', 's', 't', 'u', 'v', 'x'])
 let g:gtd_sym_window_kinds_Asm			= get(g:, "gtd_sym_window_kinds_asm", ['d', 'l', 'm', 't'])
@@ -44,8 +45,6 @@ let g:gtd_sym_list_kinds_Python			= get(g:, "gtd_sym_list_kinds_python", ['c', '
 let g:gtd_sym_list_kinds_Java			= get(g:, "gtd_sym_list_kinds_java", ['c', 'e', 'f', 'g', 'i', 'l', 'm', 'p'])
 let g:gtd_sym_list_kinds_Php			= get(g:, "gtd_sym_list_kinds_php", ['c', 'i', 'd', 'f', 'j'])
 
-let g:gtd_sym_list_show_signature		= get(g:, "gtd_sym_list_show_signature", 0)
-
 let g:gtd_sym_menu						= get(g:, "gtd_sym_menu", "» ")
 "}}}
 
@@ -65,7 +64,8 @@ let g:gtd_map_head_list			= get(g:, "gtd_map_head_list", "lh")
 let g:gtd_map_head_focus		= get(g:, "gtd_map_head_focus", "th")
 
 let g:gtd_map_opt_menu			= get(g:, "gtd_map_opt_menu", "lm")
-let g:gtd_map_sym_menu_loc		= get(g:, "gtd_map_sym_menu_loc", "ls")
+let g:gtd_map_sym_menu_all		= get(g:, "gtd_map_sym_menu_all", "ls")
+let g:gtd_map_sym_menu_func		= get(g:, "gtd_map_sym_menu_func", "lf")
 
 let g:gtd_map_quit				= get(g:, "gtd_map_quit", "q")
 let g:gtd_map_expand			= get(g:, "gtd_map_expand", "x")
@@ -120,6 +120,10 @@ function s:sym_selected(selection)
 	" check if selection is valid
 	if len(a:selection) && a:selection.menu != ""
 		let [file, line] = split(a:selection.menu, ':')
+
+		if file == "ln"
+			let file = bufname('%')
+		endif
 
 		" move to selected symbol
 		call s:sym_focus(file, line)
@@ -254,6 +258,7 @@ endfunction
 "{{{
 function s:list_add(lst, dict, key)
 	let i = 0
+
 	for e in a:lst
 		if e[a:key] >= a:dict[a:key]
 			break
@@ -281,15 +286,24 @@ endfunction
 "{{{
 " \brief	open menu with buffer-local symbols
 "
+" \param	kind			symbol kind to include
+" 							cf. g:gtd_sym_list_kinds_*
+" \param	show_signature	control whether to show symbol
+" 							signatures or its name
+"
 " \return	'<c-r>=' string, triggering auto completion
-function s:sym_menu()
+function s:sym_menu(kind="", show_signature=0)
 	let lst = []
 
 	" get symtab for current buffer
 	let symtab = gtd#symtab#get(bufname("%"))
 
+	if symtab == {}
+		return "\<esc>"
+	endif
+
 	" iterate through all considered kinds
-	for kind in g:gtd_sym_list_kinds_{symtab.lang}
+	for kind in ((a:kind == "") ? g:gtd_sym_list_kinds_{symtab.lang} : split(a:kind, "\zs"))
 		if !has_key(symtab["kinds"], kind)
 			continue
 		endif
@@ -298,19 +312,31 @@ function s:sym_menu()
 		for [sym, sym_lst] in items(symtab["kinds"][kind])
 			for entry in sym_lst
 				call s:list_add(lst, {
-					\ "menu": entry.file . ":" . entry.line,
-					\ "kind": kind,
-					\ "abbr": (g:gtd_sym_list_show_signature ? entry.signature : sym)
-					\ }, "abbr")
+					\ "menu": "ln:" . entry.line,
+					\ "kind": len(a:kind) != 1 ? kind : "",
+					\ "abbr": a:show_signature ? entry.signature : sym,
+					\ "line": str2nr(entry.line),
+					\ }, "line")
 			endfor
 		endfor
+	endfor
+
+	" identify the menu item to place the cursor on
+	" based on the item's line and the current line
+	let menu_idx = 0
+	let line = line(".")
+
+	for entry in lst
+		if entry["line"] <= line
+			let menu_idx += 1
+		endif
 	endfor
 
 	" force new tab on symbol selection
 	let s:goto_mode = "t"
 
 	" open menu
-	return util#pmenu#open(lst, s:sid . "sym_selected", "i")
+	return util#pmenu#open(lst, s:sid . "sym_selected", "i", menu_idx)
 endfunction
 "}}}
 
@@ -568,8 +594,13 @@ command -nargs=0 GtdSymWindowToggle silent call s:sym_window_toggle()
 " update symbol tables when writing a file
 autocmd BufWritePost * silent call s:update(0)
 
-" close make buffer if its the last in the current tab
+" close symbol buffer if its the last in the current tab
 exec 'autocmd BufEnter ' . g:gtd_sym_window_title . ' silent if winnr("$") == 1 | quit | endif'
+
+" close symbol buffer if a symbol has been selected
+if g:gtd_sym_window_close_on_select
+	exec 'autocmd WinLeave ' . g:gtd_sym_window_title . ' silent quit'
+endif
 "}}}
 
 """"
@@ -590,5 +621,6 @@ call util#map#n(g:gtd_map_def_split_glob,	"<insert><c-r>=" . s:sid . "sym_lookup
 call util#map#n(g:gtd_map_def_tab_glob,		"<insert><c-r>=" . s:sid . "sym_lookup('f', 'gt')<cr>", "")
 
 call util#map#n(g:gtd_map_opt_menu,			"<insert><c-r>=" . s:sid . "opt_menu()<cr>", "")
-call util#map#n(g:gtd_map_sym_menu_loc,		"<insert><c-r>=" . s:sid . "sym_menu()<cr>", "")
+call util#map#n(g:gtd_map_sym_menu_all,		"<insert><c-r>=" . s:sid . "sym_menu('', 0)<cr>", "")
+call util#map#n(g:gtd_map_sym_menu_func,	"<insert><c-r>=" . s:sid . "sym_menu('f', 1)<cr>", "")
 "}}}
