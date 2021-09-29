@@ -22,6 +22,7 @@ let g:gtd_sym_preview_width				= get(g:, "gtd_sym_preview_width", "40")
 
 let g:gtd_sym_window_show_signature		= get(g:, "gtd_sym_window_show_signature", 1)
 let g:gtd_sym_window_foldopen			= get(g:, "gtd_sym_window_foldopen", 0)
+let g:gtd_sym_window_close_on_select	= get(g:, "gtd_sym_window_close_on_select", 0)
 
 let g:gtd_sym_window_kinds_C			= get(g:, "gtd_sym_window_kinds_c", ['c', 'd', 'f', 'g', 'l', 'p', 's', 't', 'u', 'v', 'x'])
 let g:gtd_sym_window_kinds_Asm			= get(g:, "gtd_sym_window_kinds_asm", ['d', 'l', 'm', 't'])
@@ -593,8 +594,13 @@ command -nargs=0 GtdSymWindowToggle silent call s:sym_window_toggle()
 " update symbol tables when writing a file
 autocmd BufWritePost * silent call s:update(0)
 
-" close make buffer if its the last in the current tab
+" close symbol buffer if its the last in the current tab
 exec 'autocmd BufEnter ' . g:gtd_sym_window_title . ' silent if winnr("$") == 1 | quit | endif'
+
+" close symbol buffer if a symbol has been selected
+if g:gtd_sym_window_close_on_select
+	exec 'autocmd WinLeave ' . g:gtd_sym_window_title . ' silent quit'
+endif
 "}}}
 
 """"
